@@ -3,17 +3,32 @@ package com.example.myapplication
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebViewClient
+import com.onesignal.OneSignal
 import kotlinx.android.synthetic.main.activity_main.*
 
+const val ONESIGNAL_APP_ID="6b0bf19c-9dc3-466c-9fc1-0015ec035f9b"
+
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /**
+        OneSignal FCM 세팅
+         */
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE)
+        OneSignal.initWithContext(this)
+        OneSignal.setAppId(ONESIGNAL_APP_ID)
+
+        /**
+         웹뷰 세팅 및 구현
+         */
         var webSettings=webview.settings
         webview.webViewClient=WebViewClient() //새창안뜨게(웹내에서 웹뷰사용하기)
         webSettings.javaScriptEnabled=true //자바 스크립트로 이루어져있는 기능을 사용하려면 true로 설정
@@ -39,7 +54,14 @@ class MainActivity : AppCompatActivity() {
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webview.loadUrl("http://www.martroo.com/");
 
+        //앱스토어<->현재앱 버젼 체크
+        val marketVersionChecker=MarketVersionChecker(this)
+        marketVersionChecker.start()
+
     }
+
+
+
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면
