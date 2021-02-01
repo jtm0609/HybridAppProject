@@ -12,12 +12,12 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
+//Manifest에 서비스 설정을 해줘야 포그라운드에서 onMessageReceived()가 호출된다.(백그라운드는 있으나 없으나 동작)
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     val URL_TAG="URL"
     val CHANNEL_ID = "CollocNotification"
     val CHANNEL_NAME = "CollocChannel"
-    val description = "This is Colloc channel"
-    val importance = NotificationManager.IMPORTANCE_HIGH
+    val IMPORTANCE = NotificationManager.IMPORTANCE_HIGH
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -44,19 +44,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(URL_TAG,url)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        //FLAG_ONE_SHOT : 일회용으로 생성 (위젯에 적용한다면 최초 클릭에만 작동하고 그 다음 클릭부터는 작동하지 않음)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
-        var notificationManager=getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager=getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         var builder:NotificationCompat.Builder?=null
         if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
-            var channelID="channel_01"
-            var channelName="MyCHANNEL01"
 
-            var channel= NotificationChannel(channelID,channelName,NotificationManager.IMPORTANCE_DEFAULT)
+
+            var channel= NotificationChannel(CHANNEL_ID,CHANNEL_NAME,IMPORTANCE)
 
             notificationManager.createNotificationChannel(channel)
 
-            builder=NotificationCompat.Builder(this,channelID)
+            builder=NotificationCompat.Builder(this,CHANNEL_ID)
 
         }else{
             builder=NotificationCompat.Builder(this, null.toString())
@@ -67,6 +67,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         builder.setContentTitle(title)
         builder.setContentText(body)
         builder.setContentIntent(pendingIntent)
+        builder.setAutoCancel(true)
 
         var notification=builder.build()
         notificationManager.notify(1,notification)

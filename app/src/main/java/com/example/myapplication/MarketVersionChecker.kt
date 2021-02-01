@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,6 +24,10 @@ class MarketVersionChecker(val mContext:Context) :Thread() {
         //서로 버젼비교
         if(storeVer!=appVer){
             Log.d("tak","---- 앱 버젼이 다릅니다. ----")
+            var intent= Intent(mContext,VersionUpdateDialog::class.java)
+            //mContext.startActivity(intent)
+
+
         }
     }
 
@@ -33,7 +38,6 @@ class MarketVersionChecker(val mContext:Context) :Thread() {
         해당앱의 버젼 가져오기
          */
         var device_version=mContext.packageManager.getPackageInfo(mContext.getPackageName(),0).versionName
-        Log.d("tak",device_version)
         return device_version
     }
 
@@ -41,7 +45,6 @@ class MarketVersionChecker(val mContext:Context) :Thread() {
     fun getStoreVersion(): String {
         var version:String?
         try {
-            Log.d("tak", "test")
             var mUrl = URL("https://play.google.com/store/apps/details?id=com.martroo")
             var mConnection = mUrl.openConnection() as HttpURLConnection
             mConnection.connectTimeout = 2000
@@ -65,7 +68,6 @@ class MarketVersionChecker(val mContext:Context) :Thread() {
                 mReader.close()
             }
             mConnection.disconnect()
-            Log.d("tak", "sdsd")
         } catch (e: Exception) { e.printStackTrace() }
 
         var str = sb.toString()

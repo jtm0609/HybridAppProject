@@ -9,19 +9,38 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
     private var URL="http://m.martroo.com/"
+    private var backBtnTime:Long=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        /** 파이어베이스 Dynamic Link 사용
+         *  파이어베이스 dynamic Link와 별도로
+         * Manifest에 scheme를 설정해줘야 한다.
+         */
+        //SMS나 카톡에서 URL를 클릭하면
+        if(Intent.ACTION_VIEW.equals(intent.action)){
+            var uri=intent.data
+            Log.d("tak","클릭한 URL(SMS, 카톡): "+ uri.toString())
+
+            //URL 갱신
+            URL= uri.toString()
+        }
+
+
+        //포그라운드에서는 FirebaseMessagingService가 호출되어 당연히 Intent를 받아 여기에 넘겨주겠지만
+        //백그라운드에서도 파이어베이스 콘솔에서 URL키로 Value를 넘겨주면 받는다(intent로 Json을 받을 수있는것 같음)
         var pushedURL=intent.getStringExtra("URL")
         if(pushedURL!=null)  URL=pushedURL
+        Log.d("tak","Initial URL: " +URL)
 
 
-        Log.d("tak","펜딩URL: "+URL)
         /**
          웹뷰 세팅 및 구현
          */
@@ -38,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             webview.webViewClient=object :WebViewClient(){
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    Log.d("tak",url.toString())
+                    Log.d("tak","Current URL: "+url.toString())
                     //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
                 }
             }
@@ -56,8 +75,8 @@ class MainActivity : AppCompatActivity() {
        // webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webview.loadUrl(URL);
 
-        Log.d("tak",webview.url.toString())
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
+
         //앱스토어<->현재앱 버젼 체크
         val marketVersionChecker=MarketVersionChecker(this)
         marketVersionChecker.start()
@@ -65,18 +84,28 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onBackPressed() {
         //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면
         //전 페이지로 이동
-        if((keyCode==KeyEvent.KEYCODE_BACK) && webview.canGoBack()){
+        if(webview.canGoBack()){
             webview.goBack()
-            return true
         }
-        return super.onKeyDown(keyCode, event)
+
+        //뒤로가기 2번
+        else {
+            val curTime= System.currentTimeMillis()
+            if(curTime<=backBtnTime+2000){
+                super.onBackPressed()
+            }
+            else {
+                backBtnTime = curTime
+                Toast.makeText(this,"한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
     }
+
 
 
 
