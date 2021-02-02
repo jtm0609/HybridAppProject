@@ -20,6 +20,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+
         /** 파이어베이스 Dynamic Link 사용
          *  파이어베이스 dynamic Link와 별도로
          * Manifest에 scheme를 설정해줘야 한다.
@@ -34,10 +36,12 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        //포그라운드에서는 FirebaseMessagingService가 호출되어 당연히 Intent를 받아 여기에 넘겨주겠지만
-        //백그라운드에서도 파이어베이스 콘솔에서 URL키로 Value를 넘겨주면 받는다(intent로 Json을 받을 수있는것 같음)
+        //백그라운드시: Push알림시 스플래쉬 화면에서 URL을 받음
+        //포그라운드시: FirebaseMessage()에서 URL이 넘어옴
         var pushedURL=intent.getStringExtra("URL")
-        if(pushedURL!=null)  URL=pushedURL
+        if(!pushedURL.equals("null"))  {
+            URL= pushedURL.toString()
+        }
         Log.d("tak","Initial URL: " +URL)
 
 

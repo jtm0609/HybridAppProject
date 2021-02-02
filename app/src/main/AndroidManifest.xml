@@ -54,6 +54,25 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <!--
+        FCM 백그라운드에서 노티 아이콘 설정
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/test"/>
+
+        <!--
+        FCM 백그라운드에서 노티피케이션(타이틀포함) 색 설정
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@android:color/holo_red_light"/>
+
+
+
+
+
     </application>
 
 </manifest>

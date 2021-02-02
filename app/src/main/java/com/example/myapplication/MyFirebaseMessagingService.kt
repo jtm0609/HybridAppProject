@@ -17,7 +17,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     val URL_TAG="URL"
     val CHANNEL_ID = "CollocNotification"
     val CHANNEL_NAME = "CollocChannel"
-    val IMPORTANCE = NotificationManager.IMPORTANCE_HIGH
+    val IMPORTANCE = NotificationManager.IMPORTANCE_DEFAULT
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -63,7 +63,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         }
 
-        builder.setSmallIcon(R.mipmap.ic_launcher)
+        builder.setSmallIcon(R.drawable.rion)
         builder.setContentTitle(title)
         builder.setContentText(body)
         builder.setContentIntent(pendingIntent)
@@ -73,4 +73,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         notificationManager.notify(1,notification)
 
     }
+
+
+    /**토큰이 생성되었을 때 호출
+    *앱을 지우고다시 깔때마다 새로운 토큰이 갱신된다.*/
+    override fun onNewToken(myToken: String) {
+        super.onNewToken(myToken)
+        Log.d("tak","생성된 토큰: "+ myToken)
+
+        //서버에 토큰 전송
+        //sendServer()
+    }
+
 }

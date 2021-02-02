@@ -16,7 +16,10 @@ class MarketVersionChecker(val mContext:Context) :Thread() {
 
     override fun run() {
         super.run()
-        storeVer=getStoreVersion()
+        var networkInfo=NetworkInfo(mContext)
+        if(networkInfo.getNetworkStatus()) {
+            storeVer = getStoreVersion()
+        }
         appVer=getAppVersion()
         Log.d("tak","앱 스토어버전: "+storeVer)
         Log.d("tak","현재앱 버전: "+appVer)
