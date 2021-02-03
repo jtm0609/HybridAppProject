@@ -9,7 +9,7 @@ import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 
-class MarketVersionChecker(val mContext:Context) :Thread() {
+class AppVersionChecker(val mContext:Context) :Thread() {
     var sb = StringBuffer()
     var storeVer: String = ""
     var appVer:String =""

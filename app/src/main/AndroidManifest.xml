@@ -3,10 +3,9 @@
     package="com.example.myapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <!--android:hardwareAccelerated="true" <- 전체 어플리케이션 하드웨어가속을 하려면  application태그 안에 삽입-->
     <application
         android:allowBackup="true"
-        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -31,7 +30,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTop">
 
             <!--
             안드로이드 딥링크 작업
