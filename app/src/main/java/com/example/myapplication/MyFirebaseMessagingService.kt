@@ -11,7 +11,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-
+//FCM
 //Manifest에 서비스 설정을 해줘야 포그라운드에서 onMessageReceived()가 호출된다.(백그라운드는 있으나 없으나 동작)
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     val URL_TAG="URL"

@@ -9,6 +9,7 @@ import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 
+//앱버젼 체크
 class AppVersionChecker(val mContext:Context) :Thread() {
     var sb = StringBuffer()
     var storeVer: String = ""

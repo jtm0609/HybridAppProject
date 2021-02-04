@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.core.content.ContextCompat.getSystemService
-
+//네트워크 상태 체크
 class NetworkInfo(var mContext:Context) {
 
     fun getNetworkStatus():Boolean{

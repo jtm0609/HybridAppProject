@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Message
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -12,6 +13,11 @@ import androidx.annotation.RequiresApi
 import org.json.JSONObject
 
 class MyWebViewClient(val mContext:Context) : WebViewClient() {
+    //뒤로 갈 수 없는 URL
+    private val notGoBackURL=arrayOf<String>(
+        "http://m.martroo.com/",
+        "http://m.martroo.com/shop/order_finish.php"
+    )
 
     /** onPageFinished
      *  페이지가 로딩완료 될때 호출
@@ -19,6 +25,16 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
         Log.d("tak","Current URL: "+url.toString())
+
+        //뒤로갈수없는 URL을 호출했을때, 히스토리 내역 초기화
+        for(url in notGoBackURL) {
+            if (view?.url == url){
+                view.clearHistory();
+                break;
+            }
+        }
+
+
         var appVersion=mContext.packageManager.getPackageInfo(mContext.getPackageName(),0).versionName
         var mobieFlag=true
 
@@ -52,8 +68,16 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
             mContext.startActivity(Intent("android.intent.action.DIAL", Uri.parse(newUrl)))
         }
         //일반적인 URL을 로딩
-        else  view?.loadUrl(request?.url.toString())
+
+        else {
+            view?.loadUrl(request?.url.toString())
+        }
         return true
+    }
+
+    override fun onFormResubmission(view: WebView?, dontResend: Message?, resend: Message?) {
+        super.onFormResubmission(view, dontResend, resend)
+        resend!!.sendToTarget()
     }
 
     @SuppressWarnings("deprecation") //롤리팝 이하버젼 동작
@@ -69,7 +93,6 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         return true
 
     }
-
     //intent를 통해 외부앱으로 이동시키는 함수
     fun moveExternalApp(newURL:String){
         var intent= Intent.parseUri(newURL, Intent.URI_INTENT_SCHEME)

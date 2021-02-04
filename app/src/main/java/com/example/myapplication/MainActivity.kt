@@ -14,6 +14,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     private var URL="http://m.martroo.com/"
 
+
+
+
+
     //웹<-웹뷰->앱 통신 테스트 URL
     //private var URL="file:///android_asset/exam.html"
     private var backBtnTime:Long=0
@@ -68,9 +72,7 @@ class MainActivity : AppCompatActivity() {
         //웹 콘솔을 로그캣에 찍을수있게 설정
             webview.webChromeClient=object:WebChromeClient(){
                 override fun onConsoleMessage(cm: ConsoleMessage?): Boolean {
-                    Log.d("tak", cm?.message() + " -- From line "
-                            + cm?.lineNumber() + " of "
-                            + cm?.sourceId() );
+                    //Log.d("tak", cm?.message() + " -- From line " + cm?.lineNumber() + " of " + cm?.sourceId() );
 
                     return true
                 }
@@ -101,9 +103,8 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면
-        //전 페이지로 이동
-        if(webview.canGoBack()){
+        //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면-> 전 페이지로 이동
+        if(webview.canGoBack() ){
             webview.goBack()
         }
         //뒤로가기 2번
