@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myapplication">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <!--android:hardwareAccelerated="true" <- 전체 어플리케이션 하드웨어가속을 하려면  application태그 안에 삽입-->
     <application
@@ -12,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SplashActivity">
+        <activity android:name=".SplashActivity"
+            >
             <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
@@ -31,7 +33,7 @@
         </service>
 
         <activity android:name=".MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleInstance">
 
             <!--
             안드로이드 딥링크 작업

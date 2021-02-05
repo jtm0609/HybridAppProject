@@ -13,11 +13,21 @@ import androidx.annotation.RequiresApi
 import org.json.JSONObject
 
 class MyWebViewClient(val mContext:Context) : WebViewClient() {
-    //뒤로 갈 수 없는 URL
-    private val notGoBackURL=arrayOf<String>(
+
+    /** <콜백 호출순서>
+     *  1. onPagedFinished 콜백 호출(첫 URL load시)
+     * 그이후 아래과정반복
+     * 2. ShouldOverrideUrlLoading
+     * 3. onPagedFinished
+    **/
+
+    var mCurrentURL:String?=null //현재 URL 주소
+    private val notGoBackURL=arrayOf<String>( //뒤로 갈 수 없는 URL
         "http://m.martroo.com/",
         "http://m.martroo.com/shop/order_finish.php"
     )
+
+
 
     /** onPageFinished
      *  페이지가 로딩완료 될때 호출
@@ -25,6 +35,11 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
         Log.d("tak","Current URL: "+url.toString())
+
+
+
+
+
 
         //뒤로갈수없는 URL을 호출했을때, 히스토리 내역 초기화
         for(url in notGoBackURL) {
@@ -57,6 +72,17 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         var newUrl= request?.url.toString()
         Log.d("tak","should: "+request?.url)
+
+        //url 리다이렉트 문제 예외처리(결제창)
+        //현재 load된 url이 직전에 url이랑 같다면 ->뒤로가기 처리
+        Log.d("tak","UrlTest : "+mCurrentURL+" "+newUrl)
+        if(mCurrentURL!=null && mCurrentURL.equals(newUrl)){
+            Log.d("tak","sdsdsadassagas")
+            view?.goBack()
+            return false
+        }
+        mCurrentURL=newUrl //현재 URL 주소 갱신
+
 
         //모바일웹에서 다른 앱을 호출할려고하는경우
         //1. "카카오" 같은 외부앱
@@ -107,4 +133,5 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
             mContext.startActivity(marketIntent)
         }
     }
+
 }

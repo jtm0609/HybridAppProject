@@ -25,10 +25,8 @@ import java.net.URL
 //->Glide가 캐시를 사용하기 때문에 더빠르게 불러온다.
 class SplashActivity : AppCompatActivity() {
     val ADDRESS="https://blog.kakaocdn.net/dn/0mySg/btqCUccOGVk/nQ68nZiNKoIEGNJkooELF1/img.jpg"
-    val TYPE_WIFI=1
-    val TYPE_MOBILE=2
-    val TYPE_NOT_CONNECTED=3
-    lateinit var pushedURL:String
+
+     var pushedURL:String?=null
 
 
     //var client:OkHttpClient= OkHttpClient()
@@ -37,11 +35,12 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         /**
-        *파이어베이스에서 전송한 URL(Additional Data)->런처 액티비티로 수신
-        *포그라운드에서는 FirebaseMessagingService가 호출되어 additional data를 remoteMessage가 받을 수있다.
-        *백그라운드에서는 additional data를 런쳐 액티비티에서 intent로 받는다(Data는 intent의 extras형태로 전달됨) - 파이어베이스 문서에 나와있음
+         * 백그라운드 FCM시 URL 정보가 넘어옴
+         *파이어베이스에서 전송한 URL(Additional Data)->런처 액티비티로 수신
+         *포그라운드에서는 FirebaseMessagingService가 호출되어 additional data를 remoteMessage가 받을 수있다.
+         *백그라운드에서는 additional data를 런쳐 액티비티에서 intent로 받는다(Data는 intent의 extras형태로 전달됨) - 파이어베이스 문서에 나와있음
          **/
-        pushedURL= intent.getStringExtra("URL").toString()
+        pushedURL= intent.getStringExtra("URL")
 
 
         //네트워크가 활성화 되어있다면
@@ -97,7 +96,12 @@ class SplashActivity : AppCompatActivity() {
     inner class splashRunnable : Runnable{
         override fun run() {
             var intent=Intent(this@SplashActivity,MainActivity::class.java)
-            intent.putExtra("URL",pushedURL)
+
+            if(pushedURL!=null) {
+                intent.putExtra("URL", pushedURL)
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
             startActivity(intent)
             finish()
 
