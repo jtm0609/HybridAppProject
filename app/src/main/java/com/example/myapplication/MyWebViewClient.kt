@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -38,10 +39,7 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
 
 
 
-
-
-
-        //뒤로갈수없는 URL을 호출했을때, 히스토리 내역 초기화
+        //뒤로갈수없는 URL이 로딩됬을때, 히스토리 내역 초기화
         for(url in notGoBackURL) {
             if (view?.url == url){
                 view.clearHistory();
@@ -52,13 +50,18 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
 
         var appVersion=mContext.packageManager.getPackageInfo(mContext.getPackageName(),0).versionName
         var mobieFlag=true
+        var token=mContext.getSharedPreferences("TokenDB", Context.MODE_PRIVATE).getString("Token","")
+
 
         var jsonObject=JSONObject()
         jsonObject.put("version",appVersion)
         jsonObject.put("mobileapp",mobieFlag)
+        jsonObject.put("token",token)
 
         //웹뷰의 지정된 url(메인엑티비티에서 지정함)의 프론트단의 메소드로 데이터를 보낸다.
         view?.loadUrl("javascript:exam_script.plus_num("+jsonObject.toString()+")")
+
+
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
     }
 

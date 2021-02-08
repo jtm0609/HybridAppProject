@@ -99,6 +99,7 @@ class SplashActivity : AppCompatActivity() {
 
             if(pushedURL!=null) {
                 intent.putExtra("URL", pushedURL)
+                Log.d("tak","Splash에서 받은 URL: "+pushedURL)
             }
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
