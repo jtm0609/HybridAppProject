@@ -20,7 +20,7 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
      * 그이후 아래과정반복
      * 2. ShouldOverrideUrlLoading
      * 3. onPagedFinished
-    **/
+     **/
 
     var mCurrentURL:String?=null //현재 URL 주소
     private val notGoBackURL=arrayOf<String>( //뒤로 갈 수 없는 URL
@@ -38,7 +38,6 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         Log.d("tak","Current URL: "+url.toString())
 
 
-
         //뒤로갈수없는 URL이 로딩됬을때, 히스토리 내역 초기화
         for(url in notGoBackURL) {
             if (view?.url == url){
@@ -47,11 +46,15 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
             }
         }
 
+        sendMobileWeb(view) //모바일 웹으로 데이터를 전송한다.
 
+        //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
+    }
+
+    fun sendMobileWeb(view: WebView?){
         var appVersion=mContext.packageManager.getPackageInfo(mContext.getPackageName(),0).versionName
         var mobieFlag=true
         var token=mContext.getSharedPreferences("TokenDB", Context.MODE_PRIVATE).getString("Token","")
-
 
         var jsonObject=JSONObject()
         jsonObject.put("version",appVersion)
@@ -59,10 +62,8 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         jsonObject.put("token",token)
 
         //웹뷰의 지정된 url(메인엑티비티에서 지정함)의 프론트단의 메소드로 데이터를 보낸다.
-        view?.loadUrl("javascript:exam_script.plus_num("+jsonObject.toString()+")")
+        //view?.loadUrl("javascript:exam_script.plus_num("+jsonObject.toString()+")")
 
-
-        //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
     }
 
 
@@ -104,10 +105,6 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         return true
     }
 
-    override fun onFormResubmission(view: WebView?, dontResend: Message?, resend: Message?) {
-        super.onFormResubmission(view, dontResend, resend)
-        resend!!.sendToTarget()
-    }
 
     @SuppressWarnings("deprecation") //롤리팝 이하버젼 동작
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -120,8 +117,9 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         }
         else view?.loadUrl(url)
         return true
-
     }
+
+
     //intent를 통해 외부앱으로 이동시키는 함수
     fun moveExternalApp(newURL:String){
         var intent= Intent.parseUri(newURL, Intent.URI_INTENT_SCHEME)

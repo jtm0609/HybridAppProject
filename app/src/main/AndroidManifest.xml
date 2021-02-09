@@ -7,8 +7,8 @@
     <!--android:hardwareAccelerated="true" <- 전체 어플리케이션 하드웨어가속을 하려면  application태그 안에 삽입-->
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@mipmap/martroo_main2"
+        android:label="마트루"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
@@ -26,7 +26,8 @@
             android:name=".VersionUpdateDialog"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
 
-        <service android:name=".MyFirebaseMessagingService">
+        <service android:name=".MyFirebaseMessagingService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -57,19 +58,25 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="matroo-channel"/>
+
         <!--
         FCM 백그라운드에서 노티 아이콘 설정
-        -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/test"/>
 
-        <!--
+
         FCM 백그라운드에서 노티피케이션(타이틀포함) 색 설정
-        -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@android:color/holo_red_light"/>
+
+        -->
 
 
 

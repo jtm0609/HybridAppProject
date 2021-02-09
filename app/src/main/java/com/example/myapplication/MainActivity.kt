@@ -18,11 +18,11 @@ import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
-   // private var URL="http://m.martroo.com/"
+    private var URL="http://m.martroo.com/"
 
 
     //웹<-웹뷰->앱 통신 테스트 URL
-    private var URL="file:///android_asset/exam.html"
+    //private var URL="file:///android_asset/exam.html"
     private var backBtnTime:Long=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         logMyFCMToken() //FCM토큰 로그 찍기
 
 
-        //백그라운드시(앱이 스택에 없는 상태): FCM Push알림시 스플래쉬 화면-> URL 넘겨줌(제목이랑 내용은 Firebase에서 자체적으로 보여줌)
+        //백그라운드시(앱이 스택에 없는 상태): pending Intent로 URL 넘겨줌
         var pushedURL=getIntentData(intent)
         if(pushedURL!=null){
             URL=pushedURL
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun getIntentData(intent: Intent): String?{
-        var pushedURL=intent.getStringExtra("URL")
+        var pushedURL=intent.getStringExtra("url")
         Log.d("tak","pushed: "+pushedURL)
         if(pushedURL!=null)  {
             Log.d("tak","FCM!")
@@ -118,8 +118,10 @@ class MainActivity : AppCompatActivity() {
         webSettings.useWideViewPort=true //html 컨텐츠가 웹뷰에 맞게 나타나도록함
         webSettings.setSupportZoom(true) //확대 축소 기능을 사용할수있는 속성
         webSettings.domStorageEnabled=true //로컬스트리지 사용여부 설정(팝업창들을 하루동안 보지않기)
-        webSettings.setSupportMultipleWindows(true)
+        //webSettings.setSupportMultipleWindows(true)
         webSettings.javaScriptCanOpenWindowsAutomatically=true
+        webSettings.setAppCacheEnabled(true)
+        webSettings.cacheMode=WebSettings.LOAD_DEFAULT //캐시사용 설정(기간 만료 시 네트워크 사용)
 
     }
 
@@ -139,16 +141,15 @@ class MainActivity : AppCompatActivity() {
 
 
     /** 앱이 켜져있다면 액티비티를 재사용이 된다.(singleInstance) **/
-     /**
-       1. 백그라운드시(앱이 스택에 남아있는 상태): FCM Push알림시 스플래쉬 화면-> URL 넘겨줌(제목이랑 내용은 Firebase에서 자체적으로 보여줌)
-    **/
     /**
-     * 2. 포그라운드시: FCM Push알림시 FirebaseMessaging onRecieve에서 받음-> URL 넘겨줌
+    백그라운드시(앱이 스택에 남아있는 상태) or 포그라운드시
+    -> FCM Push알림시 FirebaseMessaging onRecieve에서 받음-> Pending Intent로 URL 넘겨줌
      */
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.d("tak", "onNewIntent")
         var pushedURL=getIntentData(intent!!)
+        Log.d("tak","pushedUrl"+pushedURL)
         if(pushedURL!=null) webview.loadUrl(pushedURL)
     }
 

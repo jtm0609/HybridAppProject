@@ -24,7 +24,12 @@ import java.net.URL
 //FCM
 //Manifest에 서비스 설정을 해줘야 포그라운드에서 onMessageReceived()가 호출된다.(백그라운드는 있으나 없으나 동작)
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-    val URL_TAG="URL"
+    val URL_TAG="url"
+    val TITLE_TAG="title"
+    val BODY_TAG="body"
+    val IMAGE_TAG="image"
+
+
     val CHANNEL_ID = "CollocNotification"
     val CHANNEL_NAME = "CollocChannel"
     val IMPORTANCE = NotificationManager.IMPORTANCE_DEFAULT
@@ -32,22 +37,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        System.out.println("test")
         Log.d("tak","onReceive")
-        if (remoteMessage.notification != null) {
-            val title = remoteMessage.notification?.title
-            val body= remoteMessage.notification!!.body
-            val imageUrl= remoteMessage.notification!!.imageUrl.toString()
+            val title = remoteMessage.data.get(TITLE_TAG)
+            val body= remoteMessage.data.get(BODY_TAG)
+            val imageUrl= remoteMessage.data.get(IMAGE_TAG).toString()
             val pendingUrl= remoteMessage.data.get(URL_TAG)
 
-            Log.d("tak","알림제목: "+title.toString())
-            Log.d("tak","알림본문: "+body.toString())
-            Log.d("tak","알림url: "+pendingUrl.toString())
+            Log.d("tak","알림제목: "+title)
+            Log.d("tak","알림본문: "+body)
+            Log.d("tak","알림url: "+pendingUrl)
             Log.d("tak","이미지url: "+imageUrl)
 
             if(title!=null && body!=null)
                 sendNotification(title,body,pendingUrl, imageUrl)
 
-            }
+
 
         }
 
@@ -63,6 +68,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         //코루틴
         GlobalScope.launch {
             val intent = Intent(this@MyFirebaseMessagingService, MainActivity::class.java)
+            Log.d("tak","pendingUrl: "+pendingUrl)
             if(pendingUrl!=null)
                 intent.putExtra(URL_TAG, pendingUrl)
 
@@ -90,10 +96,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
 
-            builder.setSmallIcon(R.drawable.rion) //알림 아이콘
+            builder.setSmallIcon(R.drawable.martroo_icon) //알림 아이콘
             builder.setContentTitle(title) //알림 제목
             builder.setContentText(body) // 알림 body
-            if(!imageUrl.equals(null)){
+            builder.setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.martroo_icon))
+            if(imageUrl!=null && !imageUrl.equals("null")){
                 var bitmap=UrlToBitmap(imageUrl)
                 builder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitmap))
             }

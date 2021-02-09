@@ -24,31 +24,25 @@ import java.net.URL
 //2. 네트워크 라이브러리 (OKHTTP)
 //->Glide가 캐시를 사용하기 때문에 더빠르게 불러온다.
 class SplashActivity : AppCompatActivity() {
-    val ADDRESS="https://blog.kakaocdn.net/dn/0mySg/btqCUccOGVk/nQ68nZiNKoIEGNJkooELF1/img.jpg"
+    val DYNAMIC_ADDRESS="https://taegon.kim/wp-content/uploads/2018/05/image-5.png"
 
-     var pushedURL:String?=null
-
+    var mHandler=Handler()
 
     //var client:OkHttpClient= OkHttpClient()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        /**
-         * 백그라운드 FCM시 URL 정보가 넘어옴
-         *파이어베이스에서 전송한 URL(Additional Data)->런처 액티비티로 수신
-         *포그라운드에서는 FirebaseMessagingService가 호출되어 additional data를 remoteMessage가 받을 수있다.
-         *백그라운드에서는 additional data를 런쳐 액티비티에서 intent로 받는다(Data는 intent의 extras형태로 전달됨) - 파이어베이스 문서에 나와있음
-         **/
-        pushedURL= intent.getStringExtra("URL")
 
-
-        //네트워크가 활성화 되어있다면
+        //네트워크가 활성화 되어있다면 -> Glide를 통해동적스플래쉬 사용하기
         var networkInfo=NetworkInfo(this)
-        if(networkInfo.getNetworkStatus())
-        Glide.with(this).load(ADDRESS).into(splash_iv)
+        if(networkInfo.getNetworkStatus()) {
+           // Glide.with(this).load(DYNAMIC_ADDRESS).into(splash_iv)
+            //requestImage()
+        }
 
-        var mHandler=Handler()
+
+
         mHandler.postDelayed(splashRunnable(),3000)
 
         //requestImage()
@@ -92,17 +86,14 @@ class SplashActivity : AppCompatActivity() {
 
 
 
+
+
     //스플래쉬 Runnable
     inner class splashRunnable : Runnable{
         override fun run() {
             var intent=Intent(this@SplashActivity,MainActivity::class.java)
 
-            if(pushedURL!=null) {
-                intent.putExtra("URL", pushedURL)
-                Log.d("tak","Splash에서 받은 URL: "+pushedURL)
-            }
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-
             startActivity(intent)
             finish()
 
