@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,11 +11,16 @@ import android.view.View
 import android.webkit.*
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,26 +34,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d("tak","onCreate")
-
-        logDeepLink()  //SMS나 카톡에서 URL를 클릭하면 URL 로그 찍기
         logMyFCMToken() //FCM토큰 로그 찍기
-
-
-        //백그라운드시(앱이 스택에 없는 상태): pending Intent로 URL 넘겨줌
-        var pushedURL=getIntentData(intent)
-        if(pushedURL!=null){
-            URL=pushedURL
-        }
 
         webviewSetting()
 
         //Web의 호출한 메서드내에있는 web.console을 로그캣에 찍을수있게 설정
-        webview.webChromeClient=object:WebChromeClient(){
-            override fun onConsoleMessage(cm: ConsoleMessage?): Boolean {
-                Log.d("tak", cm?.message() + " -- From line " + cm?.lineNumber() + " of " + cm?.sourceId() );
-                return true
-            }
-        }
+        webview.webChromeClient=MyWebChromeClient()
 
         //웹에서 앱의 코드를 사용가능하게 설정한다.
         webview.addJavascriptInterface(WebAppInterface(this),"Android")
@@ -56,26 +48,43 @@ class MainActivity : AppCompatActivity() {
         webview.loadUrl(URL)
 
 
-
-        //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
-
         //앱스토어<->현재앱 버젼 체크
         val marketVersionChecker=AppVersionChecker(this)
         marketVersionChecker.start()
 
+        //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
+
     }
 
 
+    //액티비티가 전면에 보일 때
+    //1. 푸시가왔는지 확인해서 푸시 URL를 로드한다.
+    //2. 다이나믹링크를 눌렀을때, 넘어온 딥링크 URL정보를 확인한다. )
+    override fun onResume() {
+        super.onResume()
+        Log.d("tak","onResume")
 
-    /** 파이어베이스 Dynamic Link 사용
-     *  파이어베이스 dynamic Link와 별도로
-     * Manifest에 scheme를 설정해줘야 한다.
-     */
-    fun logDeepLink(){
-        if(Intent.ACTION_VIEW.equals(intent.action)){
-            var uri=intent.data
-            Log.d("tak","클릭한 URL(SMS, 카톡): "+ uri.toString())
+        //FCM 푸시의 Pending Intent가 URL을 넘겨주면 그 URL을 로드한다.
+        var pushedURL=getIntentUrlData(intent)
 
+        if(pushedURL!=null){
+            URL=pushedURL
+            webview.loadUrl(URL)
+        }
+
+
+        //파어베이스 다이나믹 링크 처리
+        handleFirebaseDeepLink()
+
+    }
+
+    //intent가 새로 생길때마다 intent를 다시 설정해준다.
+    //onResume에서 그 intent를 처리할수있도록
+    //(다시 설정안해주면 onResume에서 구 intent 정보만을 계속 참조한다.
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if(intent!=null){
+            setIntent(intent)
         }
     }
 
@@ -94,9 +103,32 @@ class MainActivity : AppCompatActivity() {
             });
     }
 
+    /** 파이어베이스 Dynamic Link 사용
+     * 1. Dynamic Link를 누르면 앱으로 이동 시켜주며
+     * 2. 앱 이동과 동시에 Dynamic Link와 셋팅된 DeepLink를 파라미터로 전달 받는다.
+     */
+    fun handleFirebaseDeepLink(){
+        FirebaseDynamicLinks.getInstance()
+            .getDynamicLink(intent)
+            .addOnSuccessListener(this, object :OnSuccessListener<PendingDynamicLinkData>{
+                override fun onSuccess(pendingDynamicLink: PendingDynamicLinkData?) {
+                    var deepLink: Uri?=null
+                    if(pendingDynamicLink!=null)
+                        deepLink=pendingDynamicLink.link
+
+                    Log.d("tak","FirebaseDeepLink: "+deepLink)
+                }
+            })
+            .addOnFailureListener(this, object: OnFailureListener{
+                override fun onFailure(p0: Exception) {
+                    Log.d("tak","FirebaseDeepLink: "+"null")
+                }
+            })
+    }
 
 
-    fun getIntentData(intent: Intent): String?{
+
+    fun getIntentUrlData(intent: Intent): String?{
         var pushedURL=intent.getStringExtra("url")
         Log.d("tak","pushed: "+pushedURL)
         if(pushedURL!=null)  {
@@ -111,7 +143,9 @@ class MainActivity : AppCompatActivity() {
     //웹뷰 세팅
     fun webviewSetting(){
         //쿠키 허용
-        CookieManager.getInstance().setAcceptThirdPartyCookies(webview,true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webview,true)
+        }
 
         var webSettings=webview.settings
         webSettings.javaScriptEnabled=true //자바 스크립트로 이루어져있는 기능을 사용하려면 true로 설정
@@ -145,6 +179,7 @@ class MainActivity : AppCompatActivity() {
     백그라운드시(앱이 스택에 남아있는 상태) or 포그라운드시
     -> FCM Push알림시 FirebaseMessaging onRecieve에서 받음-> Pending Intent로 URL 넘겨줌
      */
+    /*
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.d("tak", "onNewIntent")
@@ -152,6 +187,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("tak","pushedUrl"+pushedURL)
         if(pushedURL!=null) webview.loadUrl(pushedURL)
     }
+
+     */
 
 
 
