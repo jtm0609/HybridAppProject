@@ -13,12 +13,14 @@ import org.junit.Assert.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+
+//UI 테스트
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.myapplication", appContext.packageName)
+        assertEquals("com.martroo", appContext.packageName)
     }
 }

@@ -45,7 +45,7 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
                 break;
             }
         }
-
+        mCurrentURL=url //현재 URL 주소 갱신
         sendMobileWeb(view) //모바일 웹으로 데이터를 전송한다.
 
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
@@ -85,7 +85,7 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
             view?.goBack()
             return false
         }
-        mCurrentURL=newUrl //현재 URL 주소 갱신
+
 
 
         //모바일웹에서 다른 앱을 호출할려고하는경우

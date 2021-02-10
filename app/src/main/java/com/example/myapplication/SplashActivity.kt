@@ -5,11 +5,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.util.Log
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_splash.*
@@ -26,7 +23,7 @@ import java.net.URL
 class SplashActivity : AppCompatActivity() {
     val DYNAMIC_ADDRESS="https://taegon.kim/wp-content/uploads/2018/05/image-5.png"
 
-    var mHandler=Handler()
+    var mHandler=Handler(Looper.getMainLooper())
 
     //var client:OkHttpClient= OkHttpClient()
     override fun onCreate(savedInstanceState: Bundle?) {

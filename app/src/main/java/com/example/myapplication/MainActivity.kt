@@ -19,6 +19,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.Cookie
 import org.json.JSONObject
 import java.lang.Exception
 
@@ -142,12 +143,18 @@ class MainActivity : AppCompatActivity() {
 
     //웹뷰 세팅
     fun webviewSetting(){
-        //쿠키 허용
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(webview,true)
-        }
-
         var webSettings=webview.settings
+        var cookieManager=CookieManager.getInstance()
+
+        //쿠키 허용 설정
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+           webSettings.mixedContentMode=(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW)    //https에서 http컨텐츠를 호출할 수 있게함(쿠키랑 무관)
+            cookieManager.setAcceptThirdPartyCookies(webview,true)
+        }
+        cookieManager.setAcceptCookie(true)
+
+
+
         webSettings.javaScriptEnabled=true //자바 스크립트로 이루어져있는 기능을 사용하려면 true로 설정
         webSettings.useWideViewPort=true //html 컨텐츠가 웹뷰에 맞게 나타나도록함
         webSettings.setSupportZoom(true) //확대 축소 기능을 사용할수있는 속성
@@ -155,7 +162,7 @@ class MainActivity : AppCompatActivity() {
         //webSettings.setSupportMultipleWindows(true)
         webSettings.javaScriptCanOpenWindowsAutomatically=true
         webSettings.setAppCacheEnabled(true)
-        webSettings.cacheMode=WebSettings.LOAD_DEFAULT //캐시사용 설정(기간 만료 시 네트워크 사용)
+        webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK //캐시사용 설정
 
     }
 
