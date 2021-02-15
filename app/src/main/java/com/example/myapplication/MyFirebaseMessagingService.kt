@@ -127,8 +127,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         editor.putString("Token",myToken)
         editor.commit()
 
-        //서버에 토큰 전송
-        //sendServer()
+
     }
 
     //이미지 url-> 비트맵 변환

@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -8,7 +9,9 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.*
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
@@ -26,6 +29,10 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private var URL="http://m.martroo.com/"
+    lateinit var progressBar:Dialog
+    companion object{
+        var backFlag=false
+    }
 
 
     //웹<-웹뷰->앱 통신 테스트 URL
@@ -37,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("tak","onCreate")
         logMyFCMToken() //FCM토큰 로그 찍기
 
+        progressBarSetting()
         webviewSetting()
 
         //Web의 호출한 메서드내에있는 web.console을 로그캣에 찍을수있게 설정
@@ -44,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         //웹에서 앱의 코드를 사용가능하게 설정한다.
         webview.addJavascriptInterface(WebAppInterface(this),"Android")
-        webview.webViewClient=MyWebViewClient(this)
+        webview.webViewClient=MyWebViewClient(this,progressBar)
         webviewAcceleration()
         webview.loadUrl(URL)
 
@@ -58,12 +66,30 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+    fun progressBarSetting(){
+        progressBar=Dialog(this,R.style.MyProgressDialog)
+        progressBar.setCancelable(true)
+        progressBar.addContentView(ProgressBar(this),
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
+    }
+
+
+
+
     //액티비티가 전면에 보일 때
     //1. 푸시가왔는지 확인해서 푸시 URL를 로드한다.
     //2. 다이나믹링크를 눌렀을때, 넘어온 딥링크 URL정보를 확인한다. )
     override fun onResume() {
         super.onResume()
         Log.d("tak","onResume")
+
+        if(progressBar.isShowing)
+            progressBar.dismiss()
 
         //FCM 푸시의 Pending Intent가 URL을 넘겨주면 그 URL을 로드한다.
         var pushedURL=getIntentUrlData(intent)
@@ -79,6 +105,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+
+
     //intent가 새로 생길때마다 intent를 다시 설정해준다.
     //onResume에서 그 intent를 처리할수있도록
     //(다시 설정안해주면 onResume에서 구 intent 정보만을 계속 참조한다.
@@ -88,6 +117,7 @@ class MainActivity : AppCompatActivity() {
             setIntent(intent)
         }
     }
+
 
 
 
@@ -103,6 +133,9 @@ class MainActivity : AppCompatActivity() {
                 }
             });
     }
+
+
+
 
     /** 파이어베이스 Dynamic Link 사용
      * 1. Dynamic Link를 누르면 앱으로 이동 시켜주며
@@ -126,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
+
 
 
 
@@ -153,11 +187,11 @@ class MainActivity : AppCompatActivity() {
         }
         cookieManager.setAcceptCookie(true)
 
-
-
         webSettings.javaScriptEnabled=true //자바 스크립트로 이루어져있는 기능을 사용하려면 true로 설정
         webSettings.useWideViewPort=true //html 컨텐츠가 웹뷰에 맞게 나타나도록함
-        webSettings.setSupportZoom(true) //확대 축소 기능을 사용할수있는 속성
+        webSettings.builtInZoomControls=true//  내장 줌 컨트롤 사용 여부
+        webSettings.setSupportZoom(true) //확대 축소 기능 설정
+        webSettings.displayZoomControls=false //내장 줌 컨트롤러 표시 여부
         webSettings.domStorageEnabled=true //로컬스트리지 사용여부 설정(팝업창들을 하루동안 보지않기)
         //webSettings.setSupportMultipleWindows(true)
         webSettings.javaScriptCanOpenWindowsAutomatically=true
@@ -165,6 +199,7 @@ class MainActivity : AppCompatActivity() {
         webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK //캐시사용 설정
 
     }
+
 
 
 
@@ -200,9 +235,14 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
+        backFlag=true
+
+
         //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면-> 전 페이지로 이동
         if(webview.canGoBack() ){
+            progressBar.show()
             webview.goBack()
+
 
         }
         //뒤로가기 2번

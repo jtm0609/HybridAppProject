@@ -1,5 +1,8 @@
 package com.example.myapplication
 
+import android.app.ActionBar
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,13 +10,16 @@ import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.Log
+import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import org.json.JSONObject
 
-class MyWebViewClient(val mContext:Context) : WebViewClient() {
+class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClient() {
+
 
     /** <콜백 호출순서>
      *  1. onPagedFinished 콜백 호출(첫 URL load시)
@@ -35,6 +41,10 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
      */
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
+        if(progressBar.isShowing){
+            progressBar.dismiss()
+        }
+
         Log.d("tak","Current URL: "+url.toString())
 
 
@@ -49,6 +59,7 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
         sendMobileWeb(view) //모바일 웹으로 데이터를 전송한다.
 
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
+
     }
 
     fun sendMobileWeb(view: WebView?){
@@ -74,17 +85,22 @@ class MyWebViewClient(val mContext:Context) : WebViewClient() {
      */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+
+        progressBar.show()
+
         var newUrl= request?.url.toString()
         Log.d("tak","should: "+request?.url)
 
         //url 리다이렉트 문제 예외처리(결제창)
-        //현재 load된 url이 직전에 url이랑 같다면 ->뒤로가기 처리
+        //현재 load된 url이 직전에 url이랑 같고, 백버튼을 눌렀다면 ->뒤로가기 처리
         Log.d("tak","UrlTest : "+mCurrentURL+" "+newUrl)
-        if(mCurrentURL!=null && mCurrentURL.equals(newUrl)){
+        if(mCurrentURL!=null && mCurrentURL.equals(newUrl) && MainActivity.backFlag==true){
             Log.d("tak","sdsdsadassagas")
             view?.goBack()
+            MainActivity.backFlag=false
             return false
         }
+        MainActivity.backFlag=false
 
 
 
