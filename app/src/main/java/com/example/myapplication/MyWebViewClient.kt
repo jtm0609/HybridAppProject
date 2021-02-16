@@ -6,12 +6,14 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
@@ -35,6 +37,10 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
     )
 
 
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        super.onPageStarted(view, url, favicon)
+        Log.d("tak","onpageStated: "+url.toString())
+    }
 
     /** onPageFinished
      *  페이지가 로딩완료 될때 호출
@@ -55,7 +61,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
                 break;
             }
         }
-        mCurrentURL=url //현재 URL 주소 갱신
+        //mCurrentURL=url //현재 URL 주소 갱신
         sendMobileWeb(view) //모바일 웹으로 데이터를 전송한다.
 
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
@@ -78,7 +84,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
     }
 
 
-    /**shouldOverrideUrlLoading
+    /**shouldOverrideUrlLoading =페이지가 해당 링크를 로드를할때 호출
      * 1. 새로운 URL이 webview에 로드되려 할 경우 컨트롤을 대신할 수 있다.
      * 2. super.shouldOverrideUrl.Loading 부분을 제거한다.
      * 3. 제거하지않으면 웹뷰가 자동으로 load해준다.
@@ -91,34 +97,25 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         var newUrl= request?.url.toString()
         Log.d("tak","should: "+request?.url)
 
-        //url 리다이렉트 문제 예외처리(결제창)
-        //현재 load된 url이 직전에 url이랑 같고, 백버튼을 눌렀다면 ->뒤로가기 처리
-        Log.d("tak","UrlTest : "+mCurrentURL+" "+newUrl)
-        if(mCurrentURL!=null && mCurrentURL.equals(newUrl) && MainActivity.backFlag==true){
-            Log.d("tak","sdsdsadassagas")
-            view?.goBack()
-            MainActivity.backFlag=false
-            return false
-        }
-        MainActivity.backFlag=false
-
-
+        //다시 캐시를 사용하게만든다. (카카오 외부앱으로 이동하면, 노캐쉬설정으로 바뀌므로 다시 캐시 설정)
+        view?.settings?.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
 
         //모바일웹에서 다른 앱을 호출할려고하는경우
         //1. "카카오" 같은 외부앱
         if(newUrl.startsWith("intent://")){
+            //카카오 같은경우 기존 캐시가 있으면 결제가 안되는 예외가있다. 캐시설정 새팅을 노캐쉬로 바꾼다.
+            view?.settings?.cacheMode=WebSettings.LOAD_NO_CACHE
             moveExternalApp(newUrl)
+            return true
         }
         //2. 전화앱
         else if(newUrl.startsWith("tel")){
             mContext.startActivity(Intent("android.intent.action.DIAL", Uri.parse(newUrl)))
+            return true
         }
-        //일반적인 URL을 로딩
 
-        else {
-            view?.loadUrl(request?.url.toString())
-        }
-        return true
+        mCurrentURL=newUrl
+        return false
     }
 
 

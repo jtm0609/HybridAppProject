@@ -30,9 +30,6 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
     private var URL="http://m.martroo.com/"
     lateinit var progressBar:Dialog
-    companion object{
-        var backFlag=false
-    }
 
 
     //웹<-웹뷰->앱 통신 테스트 URL
@@ -196,7 +193,9 @@ class MainActivity : AppCompatActivity() {
         //webSettings.setSupportMultipleWindows(true)
         webSettings.javaScriptCanOpenWindowsAutomatically=true
         webSettings.setAppCacheEnabled(true)
-        webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK //캐시사용 설정
+
+        //한번 페이지가 로딩된적이 있으면(캐시가 있으면) 웹의 상태를 갱신하지 않는다. (캐시를 이용해 불러온다.)
+        webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
 
     }
 
@@ -235,7 +234,6 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        backFlag=true
 
 
         //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면-> 전 페이지로 이동
