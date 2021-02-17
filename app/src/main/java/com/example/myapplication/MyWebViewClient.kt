@@ -6,16 +6,14 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import org.json.JSONObject
@@ -35,6 +33,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         "http://m.martroo.com/",
         "http://m.martroo.com/shop/order_finish.php"
     )
+
 
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -130,6 +129,52 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         }
         else view?.loadUrl(url)
         return true
+    }
+
+    //웹페이지가 로딩되는데 리소스들을 가로챈다.
+    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+        val resourceUrl=request?.url.toString()
+        //var fileExtension= request?.url.toString()
+        Log.d("tak","resourceUrl: "+resourceUrl)
+
+        //리소스 확장자 파싱
+        var parts=resourceUrl.split(".")
+
+        var fileExtension:String? //확장자
+        var type:String
+        if(parts.size>0){
+            fileExtension=parts[parts.size-1]
+            Log.d("tak",fileExtension)
+            type= getMineType(fileExtension).toString()
+        }
+
+
+
+
+        if(resourceUrl.toString().contains("SpoqaHanSans-Bold.otf")) {
+            Log.d("tak","find!!Bold")
+            var data = mContext.assets.open("SpoqaHanSans-Bold.otf")
+            return WebResourceResponse("text/css", "UTF-8", data)
+        }
+        else if(resourceUrl.toString().contains("SpoqaHanSans-Regular.otf")){
+            Log.d("tak","find!!Regular")
+            var data = mContext.assets.open("SpoqaHanSans-Regular.otf")
+            return WebResourceResponse("application/x-font-opentype", "UTF-8", data)
+        }
+
+
+        return super.shouldInterceptRequest(view, request)
+
+    }
+
+    //확장자에맞는 웹 리소스의 MineType을 반환한다.
+    fun getMineType(fileExtension: String): String?{
+        when(fileExtension){
+            "css"->return "text/css"
+            "js"->return "text/javascript"
+            "eot", "otf","svg","woff" , "woff2" -> return "application/x-font-opentype"
+            else -> return null
+        }
     }
 
 

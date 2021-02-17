@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.app.Application
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
@@ -39,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d("tak","onCreate")
+
+        Log.d("tak", application.filesDir.toString())
         logMyFCMToken() //FCM토큰 로그 찍기
 
         progressBarSetting()
@@ -197,6 +200,8 @@ class MainActivity : AppCompatActivity() {
         //한번 페이지가 로딩된적이 있으면(캐시가 있으면) 웹의 상태를 갱신하지 않는다. (캐시를 이용해 불러온다.)
         webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
 
+
+
     }
 
 
@@ -204,10 +209,13 @@ class MainActivity : AppCompatActivity() {
 
     //뷰만 하드웨어 가속, (Manifest에서 정의하면 전체 애플리케이션 하드웨어가속, 특정 액티비티만 하드웨어가속시킬수도 있다.)
     fun webviewAcceleration(){
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            webview.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+
         } else {
-            webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         }
         // webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     }
