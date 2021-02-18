@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <!--android:hardwareAccelerated="true" <- 전체 어플리케이션 하드웨어가속을 하려면  application태그 안에 삽입-->
     <application
         android:allowBackup="true"

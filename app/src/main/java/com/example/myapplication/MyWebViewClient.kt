@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.app.ActionBar
 import android.app.Dialog
+import android.app.DownloadManager
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Message
 import android.util.Log
 import android.view.ViewGroup
@@ -17,6 +19,10 @@ import android.webkit.*
 import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import org.json.JSONObject
+import java.io.File
+import java.io.InputStream
+import java.lang.Exception
+import java.net.URI
 
 class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClient() {
 
@@ -137,30 +143,76 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         //var fileExtension= request?.url.toString()
         Log.d("tak","resourceUrl: "+resourceUrl)
 
-        //리소스 확장자 파싱
-        var parts=resourceUrl.split(".")
-
-        var fileExtension:String? //확장자
-        var type:String
-        if(parts.size>0){
-            fileExtension=parts[parts.size-1]
-            Log.d("tak",fileExtension)
-            type= getMineType(fileExtension).toString()
-        }
 
 
+            //Resource 파일명 파싱
+            var parts=resourceUrl.split("/")
+
+            var fileName:String?=null //파일명(js,font,css등)
+            if(parts.size>0){
+                fileName=parts[parts.size-1]
+            }
+
+            //Log.d("tak","파일명: "+fileName)
+
+            var data:InputStream?
+
+            if (fileName != null) {
+
+                //font
+                if (fileName.contains("otf") ||
+                    fileName.contains("eot") ||
+                    fileName.contains("svg") ||
+                    fileName.contains("woff") ||
+                    fileName.contains("woff2")
+                ) {
+                    try {
+                        data = mContext.assets.open(fileName)
+
+                        //asset폴더에 있다면
+                        Log.d("tak", "find!!: " + fileName)
+                        var mineType = getMineType("otf")
+                        return WebResourceResponse(mineType, "UTF-8", data)
+
+                    }catch (e:Exception){ e.printStackTrace()}
+                }
 
 
-        if(resourceUrl.toString().contains("SpoqaHanSans-Bold.otf")) {
-            Log.d("tak","find!!Bold")
-            var data = mContext.assets.open("SpoqaHanSans-Bold.otf")
-            return WebResourceResponse("text/css", "UTF-8", data)
-        }
-        else if(resourceUrl.toString().contains("SpoqaHanSans-Regular.otf")){
-            Log.d("tak","find!!Regular")
-            var data = mContext.assets.open("SpoqaHanSans-Regular.otf")
-            return WebResourceResponse("application/x-font-opentype", "UTF-8", data)
-        }
+                //css
+                else if (fileName.contains("css")) {
+                    try{
+                    data= mContext.assets.open(fileName)
+
+                    //asset폴더에 있다면
+                    Log.d("tak", "find!!: " + fileName)
+                    var mineType = getMineType("css")
+                    return WebResourceResponse(mineType, "UTF-8", data)
+                    }
+
+                    catch (e:Exception) {e.printStackTrace()}
+                }
+
+                //js
+                else if(fileName.contains("js")){
+                    try{
+                        data= mContext.assets.open(fileName)
+
+                        //asset폴더에 있다면
+                        Log.d("tak", "find!!: " + fileName)
+                        var mineType = getMineType("js")
+                        return WebResourceResponse(mineType, "UTF-8", data)
+                    }
+
+                    catch (e:Exception) {e.printStackTrace()}
+                }
+
+            }
+
+
+
+
+
+
 
 
         return super.shouldInterceptRequest(view, request)
@@ -168,7 +220,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
     }
 
     //확장자에맞는 웹 리소스의 MineType을 반환한다.
-    fun getMineType(fileExtension: String): String?{
+    fun getMineType(fileExtension: String?): String?{
         when(fileExtension){
             "css"->return "text/css"
             "js"->return "text/javascript"

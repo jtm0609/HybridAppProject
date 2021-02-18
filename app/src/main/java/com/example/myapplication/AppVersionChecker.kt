@@ -1,6 +1,8 @@
 package com.example.myapplication
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.util.Log
 import java.io.BufferedReader
@@ -8,6 +10,7 @@ import java.io.InputStreamReader
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.logging.Handler
 
 //앱버젼 체크
 class AppVersionChecker(val mContext:Context) :Thread() {
@@ -17,8 +20,8 @@ class AppVersionChecker(val mContext:Context) :Thread() {
 
     override fun run() {
         super.run()
-        var networkInfo=NetworkInfo(mContext)
-        if(networkInfo.getNetworkStatus()) {
+
+        if(NetworkUtil.getNetworkStatus(mContext)) {
             storeVer = getStoreVersion()
         }
         appVer=getAppVersion()
@@ -28,7 +31,30 @@ class AppVersionChecker(val mContext:Context) :Thread() {
         //서로 버젼비교
         if(storeVer!=appVer){
             Log.d("tak","---- 앱 버젼이 다릅니다. ----")
-            var intent= Intent(mContext,VersionUpdateDialog::class.java)
+            var dialogBulder=AlertDialog.Builder(mContext)
+            dialogBulder.setTitle("업데이트")
+                .setMessage("업데이트를 하시겠습니까?")
+                .setCancelable(false) //뒤로 버튼 클릭시 취소 가능 설정
+                .setPositiveButton("확인", object: DialogInterface.OnClickListener
+                {
+                    override fun onClick(dialog: DialogInterface?, p1: Int) {
+
+                    }
+                })
+                .setNegativeButton("취소",object:DialogInterface.OnClickListener{
+                    override fun onClick(dialog: DialogInterface?, p1: Int) {
+
+                    }
+                })
+
+
+            //**구현해야할부분
+            //UI 부분 처리
+            var dialog=dialogBulder.create()
+            dialog.show()
+
+
+            //var intent= Intent(mContext,VersionUpdateDialog::class.java)
             //mContext.startActivity(intent)
 
 

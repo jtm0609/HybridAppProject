@@ -2,12 +2,15 @@ package com.example.myapplication
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_splash.*
 import okhttp3.*
@@ -15,6 +18,7 @@ import java.io.IOException
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.jar.Manifest
 
 //동적 스플래쉬 방법
 //1. Glide
@@ -29,11 +33,21 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        /*
+        val Permissions=arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+        if((ContextCompat.checkSelfPermission(this,android.Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(this,Permissions,100)
+
+
+        }
+
+         */
 
         //네트워크가 활성화 되어있다면 -> Glide를 통해동적스플래쉬 사용하기
-        var networkInfo=NetworkInfo(this)
-        if(networkInfo.getNetworkStatus()) {
+        if(NetworkUtil.getNetworkStatus(this)) {
            // Glide.with(this).load(DYNAMIC_ADDRESS).into(splash_iv)
             //requestImage()
         }
