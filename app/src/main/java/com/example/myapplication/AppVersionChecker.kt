@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Looper
 import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -17,6 +18,7 @@ class AppVersionChecker(val mContext:Context) :Thread() {
     var sb = StringBuffer()
     var storeVer: String = ""
     var appVer:String =""
+    var handler=android.os.Handler(Looper.getMainLooper())
 
     override fun run() {
         super.run()
@@ -29,29 +31,36 @@ class AppVersionChecker(val mContext:Context) :Thread() {
         Log.d("tak","현재앱 버전: "+appVer)
 
         //서로 버젼비교
+        //버젼이 틀리면 다이얼로그 표시
         if(storeVer!=appVer){
             Log.d("tak","---- 앱 버젼이 다릅니다. ----")
-            var dialogBulder=AlertDialog.Builder(mContext)
+            //var dialogBulder=AlertDialog.Builder(mContext,android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
+            var dialogBulder=AlertDialog.Builder(mContext,android.R.style.Theme_Material_Light)
             dialogBulder.setTitle("업데이트")
                 .setMessage("업데이트를 하시겠습니까?")
-                .setCancelable(false) //뒤로 버튼 클릭시 취소 가능 설정
-                .setPositiveButton("확인", object: DialogInterface.OnClickListener
+                .setCancelable(true) //뒤로 버튼 클릭시 취소 가능 설정
+                .setPositiveButton("취소", object: DialogInterface.OnClickListener
                 {
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
 
                     }
                 })
-                .setNegativeButton("취소",object:DialogInterface.OnClickListener{
+                .setNegativeButton("확인",object:DialogInterface.OnClickListener{
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
 
                     }
                 })
 
 
-            //**구현해야할부분
-            //UI 부분 처리
-            var dialog=dialogBulder.create()
-            dialog.show()
+            handler.post(object :Runnable{
+                override fun run() {
+                    //UI 부분 처리
+                    var dialog=dialogBulder.create()
+                    //dialog.show()
+                }
+            })
+
+
 
 
             //var intent= Intent(mContext,VersionUpdateDialog::class.java)

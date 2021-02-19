@@ -57,6 +57,9 @@
                 <data
                     android:host="petfriends.page.link"
                     android:scheme="https" />
+                <data
+                    android:host="m.naver.com"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
 

@@ -42,10 +42,6 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
 
 
 
-    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
-        Log.d("tak","onpageStated: "+url.toString())
-    }
 
     /** onPageFinished
      *  페이지가 로딩완료 될때 호출
@@ -137,11 +133,14 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         return true
     }
 
+
+
+
     //웹페이지가 로딩되는데 리소스들을 가로챈다.
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
         val resourceUrl=request?.url.toString()
         //var fileExtension= request?.url.toString()
-        Log.d("tak","resourceUrl: "+resourceUrl)
+        //Log.d("tak","resourceUrl: "+resourceUrl)
 
 
 
