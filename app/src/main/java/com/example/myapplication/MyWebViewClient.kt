@@ -1,28 +1,16 @@
 package com.example.myapplication
 
-import android.app.ActionBar
 import android.app.Dialog
-import android.app.DownloadManager
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.res.AssetManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.os.Message
 import android.util.Log
-import android.view.ViewGroup
 import android.webkit.*
-import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import org.json.JSONObject
-import java.io.File
+import ren.yale.android.cachewebviewlib.WebViewCacheInterceptorInst
 import java.io.InputStream
-import java.lang.Exception
-import java.net.URI
 
 class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClient() {
 
@@ -55,6 +43,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         Log.d("tak","Current URL: "+url.toString())
 
 
+
         //뒤로갈수없는 URL이 로딩됬을때, 히스토리 내역 초기화
         for(url in notGoBackURL) {
             if (view?.url == url){
@@ -63,8 +52,12 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
             }
         }
         //mCurrentURL=url //현재 URL 주소 갱신
-        sendMobileWeb(view) //모바일 웹으로 데이터를 전송한다.
+        //모바일 웹으로 데이터(버전, 토큰, 모바일플래그)를 전송한다.
+        sendMobileWeb(view)
 
+        //모바일웹으로 다이나믹 링크로 받은 추천인 코드를 보낸다.
+        if(url.equals("http://m.martroo.com/member/join_step1.php"))
+            view?.loadUrl("javascript:recommendCode('"+ MainActivity.recommend_code +"')")
         //Log.d("tak",CookieManager.getInstance().getCookie(webview.url));
 
     }
@@ -81,6 +74,8 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
 
         //웹뷰의 지정된 url(메인엑티비티에서 지정함)의 프론트단의 메소드로 데이터를 보낸다.
         //view?.loadUrl("javascript:exam_script.plus_num("+jsonObject.toString()+")")
+
+
 
     }
 
@@ -211,10 +206,8 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
 
 
 
-
-
-
-        return super.shouldInterceptRequest(view, request)
+        //return super.shouldInterceptRequest(view, request)
+        return  WebViewCacheInterceptorInst.getInstance().interceptRequest(request);
 
     }
 

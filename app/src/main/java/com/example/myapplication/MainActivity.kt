@@ -1,19 +1,19 @@
 package com.example.myapplication
 
-import android.app.Application
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Message
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.WebSettings
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -23,14 +23,17 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.Cookie
-import org.json.JSONObject
-import java.lang.Exception
+import ren.yale.android.cachewebviewlib.WebViewCacheInterceptor
+import ren.yale.android.cachewebviewlib.WebViewCacheInterceptorInst
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
     private var URL="http://m.martroo.com/"
     lateinit var progressBar:Dialog
+    companion object{
+        var recommend_code:String?=null
+    }
 
 
     //웹<-웹뷰->앱 통신 테스트 URL
@@ -41,20 +44,48 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d("tak","onCreate")
 
-        Log.d("tak", application.filesDir.toString())
+        Log.d("tak", application.cacheDir.toString())
         logMyFCMToken() //FCM토큰 로그 찍기
+
 
         progressBarSetting()
         webviewSetting()
 
+
+
+        //캐시 용량을 늘린다. (라이브러리 사용)
+        WebViewCacheInterceptorInst.getInstance().init(WebViewCacheInterceptor.Builder(this))
+
+
+
+
+
         //Web의 호출한 메서드내에있는 web.console을 로그캣에 찍을수있게 설정
         webview.webChromeClient=MyWebChromeClient()
+        Log.d("tak",Environment.getExternalStorageDirectory().absolutePath)
+        if(cacheDir.exists()){
+
+            var cacheFiles=getCacheDir().listFiles()
+            for(file in cacheFiles)
+                Log.d("tak", "캐시 저장소 파일명: "+file.toString())
+            var martrooCacheFile=File(getCacheDir(),"martrooCache").listFiles()
+            for(file in martrooCacheFile)
+                Log.d("tak", " 마트루 캐시 저장소 파일명: "+file.toString())
+
+
+        }
+
 
         //웹에서 앱의 코드를 사용가능하게 설정한다.
         webview.addJavascriptInterface(WebAppInterface(this),"Android")
         webview.webViewClient=MyWebViewClient(this,progressBar)
         webviewAcceleration()
         webview.loadUrl(URL)
+
+
+
+
+
 
 
         //앱스토어<->현재앱 버젼 체크
@@ -103,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         //파어베이스 다이나믹 링크 처리
         handleFirebaseDeepLink()
 
+
     }
 
 
@@ -149,6 +181,18 @@ class MainActivity : AppCompatActivity() {
                     var deepLink: Uri?=null
                     if(pendingDynamicLink!=null)
                         deepLink=pendingDynamicLink.link
+
+
+                    recommend_code=deepLink?.getQueryParameter("commend_code")
+                    Log.d("tak","추천코드: "+recommend_code)
+
+                    //추천인 코드가있다면
+                    if(recommend_code!=null){
+                        Log.d("tak","추천인 코드 있음 ")
+                        webview.loadUrl("http://m.martroo.com/member/join_step1.php")
+
+                    }
+
 
                     Log.d("tak","FirebaseDeepLink: "+deepLink)
                 }
@@ -199,6 +243,7 @@ class MainActivity : AppCompatActivity() {
 
         //한번 페이지가 로딩된적이 있으면(캐시가 있으면) 웹의 상태를 갱신하지 않는다. (캐시를 이용해 불러온다.)
         webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
+
 
 
 
