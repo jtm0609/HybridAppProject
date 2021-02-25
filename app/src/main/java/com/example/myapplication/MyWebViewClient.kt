@@ -135,8 +135,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
         val resourceUrl=request?.url.toString()
         //var fileExtension= request?.url.toString()
-        //Log.d("tak","resourceUrl: "+resourceUrl)
-
+        Log.d("tak","resourceUrl: "+resourceUrl)
 
 
             //Resource 파일명 파싱
@@ -161,7 +160,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
                     fileName.contains("woff2")
                 ) {
                     try {
-                        data = mContext.assets.open(fileName)
+                        data = mContext.assets.open("static/"+fileName)
 
                         //asset폴더에 있다면
                         Log.d("tak", "find!!: " + fileName)
@@ -175,10 +174,10 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
                 //css
                 else if (fileName.contains("css")) {
                     try{
-                    data= mContext.assets.open(fileName)
+                    data= mContext.assets.open("static/"+fileName)
 
                     //asset폴더에 있다면
-                    Log.d("tak", "find!!: " + fileName)
+                    //Log.d("tak", "find!!: " + fileName)
                     var mineType = getMineType("css")
                     return WebResourceResponse(mineType, "UTF-8", data)
                     }
@@ -189,10 +188,10 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
                 //js
                 else if(fileName.contains("js")){
                     try{
-                        data= mContext.assets.open(fileName)
+                        data= mContext.assets.open("static/"+fileName)
 
                         //asset폴더에 있다면
-                        Log.d("tak", "find!!: " + fileName)
+                        //Log.d("tak", "find!!: " + fileName)
                         var mineType = getMineType("js")
                         return WebResourceResponse(mineType, "UTF-8", data)
                     }
@@ -204,10 +203,13 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
 
 
 
+        if(resourceUrl.contains("martroo")) {
+                return WebViewCacheInterceptorInst.getInstance().interceptRequest(request)
+            }
 
 
-        //return super.shouldInterceptRequest(view, request)
-        return  WebViewCacheInterceptorInst.getInstance().interceptRequest(request);
+        return super.shouldInterceptRequest(view, request)
+
 
     }
 

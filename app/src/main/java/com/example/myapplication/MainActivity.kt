@@ -5,10 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.widget.ProgressBar
@@ -25,7 +25,6 @@ import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
 import ren.yale.android.cachewebviewlib.WebViewCacheInterceptor
 import ren.yale.android.cachewebviewlib.WebViewCacheInterceptorInst
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,9 +41,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.d("tak","onCreate")
 
-        Log.d("tak", application.cacheDir.toString())
         logMyFCMToken() //FCM토큰 로그 찍기
 
 
@@ -54,7 +51,13 @@ class MainActivity : AppCompatActivity() {
 
 
         //캐시 용량을 늘린다. (라이브러리 사용)
-        WebViewCacheInterceptorInst.getInstance().init(WebViewCacheInterceptor.Builder(this))
+        var builder=WebViewCacheInterceptor.Builder(this)
+        //builder.setAssetsDir("static")
+
+       // builder.isAssetsSuffixMod(true)
+        WebViewCacheInterceptorInst.getInstance().initAssetsData()
+        WebViewCacheInterceptorInst.getInstance().init(builder)
+
 
 
 
@@ -62,16 +65,19 @@ class MainActivity : AppCompatActivity() {
 
         //Web의 호출한 메서드내에있는 web.console을 로그캣에 찍을수있게 설정
         webview.webChromeClient=MyWebChromeClient()
-        Log.d("tak",Environment.getExternalStorageDirectory().absolutePath)
         if(cacheDir.exists()){
 
+            /*
+            //캐시디렉토리, 파일명 로그찍기
             var cacheFiles=getCacheDir().listFiles()
             for(file in cacheFiles)
                 Log.d("tak", "캐시 저장소 파일명: "+file.toString())
-            var martrooCacheFile=File(getCacheDir(),"martrooCache").listFiles()
+            var martrooCacheFile=File(getCacheDir(),"CacheWebViewCache").listFiles()
             for(file in martrooCacheFile)
                 Log.d("tak", " 마트루 캐시 저장소 파일명: "+file.toString())
 
+
+             */
 
         }
 
@@ -100,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
     fun progressBarSetting(){
         progressBar=Dialog(this,R.style.MyProgressDialog)
+        progressBar.window!!.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND) //뒷 배경화면이 검게변하지않게 하기
         progressBar.setCancelable(true)
         progressBar.addContentView(ProgressBar(this),
             ViewGroup.LayoutParams(
@@ -117,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     //2. 다이나믹링크를 눌렀을때, 넘어온 딥링크 URL정보를 확인한다. )
     override fun onResume() {
         super.onResume()
-        Log.d("tak","onResume")
+        //Log.d("tak","onResume")
 
         if(progressBar.isShowing)
             progressBar.dismiss()
@@ -183,20 +190,23 @@ class MainActivity : AppCompatActivity() {
                         deepLink=pendingDynamicLink.link
 
 
-                    recommend_code=deepLink?.getQueryParameter("commend_code")
-                    Log.d("tak","추천코드: "+recommend_code)
-
-                    //추천인 코드가있다면
-                    if(recommend_code!=null){
-                        Log.d("tak","추천인 코드 있음 ")
-                        webview.loadUrl("http://m.martroo.com/member/join_step1.php")
-
+                    if(deepLink!=null) {
+                        recommend_code=commendParsing(deepLink.toString())
+                        Log.d("tak","commendCode: "+recommend_code)
                     }
 
 
+                    //추천인 코드가있다면
+                    if(recommend_code!=null){
+                        Log.d("tak","commendCode exist!")
+                        webview.loadUrl("http://m.martroo.com/member/join_step1.php")
+                    }
                     Log.d("tak","FirebaseDeepLink: "+deepLink)
                 }
             })
+
+
+
             .addOnFailureListener(this, object: OnFailureListener{
                 override fun onFailure(p0: Exception) {
                     Log.d("tak","FirebaseDeepLink: "+"null")
@@ -204,18 +214,28 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    fun commendParsing(url:String): String{
+        var str = url.split("?")
+        var s = str[1].split("/")
+        var ss = s[0].split("=")
+        return ss[1];
+
+    }
+
 
 
 
     fun getIntentUrlData(intent: Intent): String?{
         var pushedURL=intent.getStringExtra("url")
-        Log.d("tak","pushed: "+pushedURL)
+        //Log.d("tak","pushed: "+pushedURL)
         if(pushedURL!=null)  {
             Log.d("tak","FCM!")
             return pushedURL.toString()
         }
         return null
     }
+
+
 
 
 
@@ -231,6 +251,7 @@ class MainActivity : AppCompatActivity() {
         }
         cookieManager.setAcceptCookie(true)
 
+
         webSettings.javaScriptEnabled=true //자바 스크립트로 이루어져있는 기능을 사용하려면 true로 설정
         webSettings.useWideViewPort=true //html 컨텐츠가 웹뷰에 맞게 나타나도록함
         webSettings.builtInZoomControls=true//  내장 줌 컨트롤 사용 여부
@@ -244,9 +265,6 @@ class MainActivity : AppCompatActivity() {
         //한번 페이지가 로딩된적이 있으면(캐시가 있으면) 웹의 상태를 갱신하지 않는다. (캐시를 이용해 불러온다.)
         webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
 
-
-
-
     }
 
 
@@ -254,8 +272,6 @@ class MainActivity : AppCompatActivity() {
 
     //뷰만 하드웨어 가속, (Manifest에서 정의하면 전체 애플리케이션 하드웨어가속, 특정 액티비티만 하드웨어가속시킬수도 있다.)
     fun webviewAcceleration(){
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             webview.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
@@ -268,33 +284,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    /** 앱이 켜져있다면 액티비티를 재사용이 된다.(singleInstance) **/
-    /**
-    백그라운드시(앱이 스택에 남아있는 상태) or 포그라운드시
-    -> FCM Push알림시 FirebaseMessaging onRecieve에서 받음-> Pending Intent로 URL 넘겨줌
-     */
-    /*
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        Log.d("tak", "onNewIntent")
-        var pushedURL=getIntentData(intent!!)
-        Log.d("tak","pushedUrl"+pushedURL)
-        if(pushedURL!=null) webview.loadUrl(pushedURL)
-    }
-
-     */
-
-
-
     override fun onBackPressed() {
-
-
         //뒤로가기버튼을 누를때, 웹뷰에서 역시 뒤로갈수있는 상황이면-> 전 페이지로 이동
         if(webview.canGoBack() ){
             progressBar.show()
             webview.goBack()
-
-
         }
         //뒤로가기 2번
         else {
@@ -307,7 +301,14 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this,"한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
+
+
+    override fun onDestroy() {
+        Log.d("tak","onDestroy")
+        super.onDestroy()
+        recommend_code=null
     }
 
 
