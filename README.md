@@ -13,7 +13,7 @@
 * Firebase DynamicLink를 통한 앱 이동 
 * Glide를 통한 동적 스플래쉬 
 * 하이브리드 앱 성능개선(캐시 사이즈 UP)
-* okHttp를 통한 버전체크를  앱 업데이트 알림 
+* okHttp를 통한 버전체크   앱 업데이트 알림 
 <br><br>
 
 
