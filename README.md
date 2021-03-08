@@ -23,8 +23,8 @@
 * Android (Kotlin)
 * Firebase Cloud Messaging(FCM)
 * Firebase Dynamic Link
-* Glide(동적 스플래쉬)
-* OKHttp
+* Glide
+* Retrofit
 * Coroutine 
 * View Binding
 <br><br>
