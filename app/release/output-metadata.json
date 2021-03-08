@@ -4,14 +4,14 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.martroo",
+  "applicationId": "com.example.myapplication",
   "variantName": "processReleaseResources",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "versionCode": 1,
-      "versionName": "1.0",
+      "versionName": "3.0.004",
       "outputFile": "app-release.apk"
     }
   ]

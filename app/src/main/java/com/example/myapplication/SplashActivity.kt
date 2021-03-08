@@ -1,24 +1,11 @@
 package com.example.myapplication
 
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.activity_splash.*
-import okhttp3.*
-import java.io.IOException
-import java.lang.Exception
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.jar.Manifest
+import com.example.myapplication.utils.NetworkUtil
 
 //동적 스플래쉬 방법
 //1. Glide
@@ -54,7 +41,7 @@ class SplashActivity : AppCompatActivity() {
 
 
 
-        mHandler.postDelayed(splashRunnable(),3000)
+        mHandler.postDelayed(splashRunnable(),2000)
 
         //requestImage()
     }

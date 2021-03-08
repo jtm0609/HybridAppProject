@@ -2,31 +2,36 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import kotlinx.android.synthetic.main.activity_version_update_dialog.*
+import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.databinding.ActivityVersionUpdateDialogBinding
+
 
 class VersionUpdateDialog : AppCompatActivity(), View.OnClickListener {
+    lateinit var binding: ActivityVersionUpdateDialogBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val packageName="com.martroo"
+        val packageName=getPackageName()
 
-        setContentView(R.layout.activity_version_update_dialog)
-        positive_bt.setOnClickListener(this)
-        negative_bt.setOnClickListener(this)
+        binding= ActivityVersionUpdateDialogBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+
+        binding.positiveBt.setOnClickListener(this)
+        binding.negativeBt.setOnClickListener(this)
     }
 
     override fun onClick(bt: View?) {
         //플레이스토어 앱 업데이트 화면 이동 이동
-        if(bt==positive_bt) {
+        if(bt==binding.positiveBt) {
             var intent= Intent(Intent.ACTION_VIEW)
 
             intent.setData(Uri.parse("market://details?id="+packageName))
             startActivity(intent)
         }
-        else if(bt==negative_bt) finish()
+        else if(bt==binding.negativeBt) finish()
 
     }
 }
