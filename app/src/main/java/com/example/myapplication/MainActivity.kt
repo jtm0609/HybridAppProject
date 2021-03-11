@@ -20,10 +20,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.utils.InAppUpdateUtil
 import com.example.myapplication.utils.PlayStoreUpdateUtil
+import com.example.myapplication.webclient.MyWebChromeClient
+import com.example.myapplication.webclient.MyWebViewClient
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.iid.FirebaseInstanceId
@@ -63,11 +66,11 @@ class MainActivity : AppCompatActivity() {
         //1. 웹뷰가 웹resouce를 interrupt할때, 네트워크 라이브러리(okHttp)를 통해 그 resource를 로드한다.
         //2. 그 Resource를 새로지정한 캐시폴더에 저장하는 방법을 사용한다.
         var builder=WebViewCacheInterceptor.Builder(this)
-        builder.setAssetsDir("static")
         WebViewCacheInterceptorInst.getInstance().init(builder)
 
 
         webview.loadUrl(URL)
+
 
 
         //인앱 업데이트는 롤리팝이상
@@ -80,16 +83,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode==REQUEST_CODE_UPDATE){
 
-            //업데이트 클릭
+            //인앱 업데이트 클릭
             if(resultCode==Activity.RESULT_OK){
-                Toast.makeText(this, "다운로드가 시작됩니다.", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(webview, "다운로드가 시작됩니다. ", Snackbar.LENGTH_INDEFINITE).show()
             }
 
-            //업데이트거부 클릭
+            //인앱 업데이트거부 클릭
             else if(resultCode==Activity.RESULT_CANCELED){
                 //업데이트 거부 정보 프리퍼런스에 저장
                 Toast.makeText(this, "앱 업데이트가 거부됨!", Toast.LENGTH_SHORT).show()
@@ -100,6 +104,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 
 
@@ -139,6 +145,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
     /** 파이어베이스 토큰 조회 **/
     fun logMyFCMToken(){
         FirebaseInstanceId.getInstance().getInstanceId()
@@ -172,6 +180,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     /** 웹뷰 셋팅 **/
     fun webviewSetting(){
         var webSettings=webview.settings
@@ -199,11 +208,16 @@ class MainActivity : AppCompatActivity() {
         webSettings.cacheMode=WebSettings.LOAD_CACHE_ELSE_NETWORK
 
         //Web의 호출한 메서드내에있는 web.console을 로그캣에 찍을수있게 설정
-        webview.webChromeClient=MyWebChromeClient()
+        webview.webChromeClient=
+            MyWebChromeClient()
 
         //웹에서 앱의 코드를 사용가능하게 설정한다.
         webview.addJavascriptInterface(WebAppInterface(this),"Android")
-        webview.webViewClient=MyWebViewClient(this,progressBar)
+        webview.webViewClient=
+            MyWebViewClient(
+                this,
+                progressBar
+            )
 
         //웹뷰 가속화
         webviewAcceleration()
@@ -216,7 +230,7 @@ class MainActivity : AppCompatActivity() {
 
 
     /** onNewIntent
-     * intent가 새로 생길때마다 intent를 다시 설정해준다.
+     * intent가 새로 생길때마다 intent를 다시 설정해준다.(FCM)
      * onResume에서 그 intent를 처리할수있도록
      * (다시 설정안해주면 onResume에서 구 intent 정보만을 계속 참조한다.
      **/
@@ -259,9 +273,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
     /** 추천인 코드 문자열 파싱 **/
     fun commendParsing(url:String): String?{
         if(url.contains("recommend_code")) {
@@ -272,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         }
         return ""
     }
+
 
 
 

@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.webclient
 
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient

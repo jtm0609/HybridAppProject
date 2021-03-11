@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.webclient
 
 import android.app.Dialog
 import android.content.Context
@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import android.webkit.*
 import androidx.annotation.RequiresApi
+import com.example.myapplication.MainActivity
 import org.apache.commons.io.FilenameUtils
 import ren.yale.android.cachewebviewlib.WebViewCacheInterceptorInst
 import java.io.File
@@ -64,7 +65,7 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
         //모바일웹으로 멤버, 토큰, 버전정보를 보낸다.
         if(url.equals("http://m.martroo.com/")) {
             view?.loadUrl("javascript:registerMemberTokenInPage('" + token + "')") //토큰 등록
-            view?.loadUrl("javascript:setMemberVersionAndroid('" + versionCode + "')") //버전 등록
+            view?.loadUrl("javascript:setMemberVersionAndroid('" + versionCode  + "')") //버전 등록
         }
 
 
