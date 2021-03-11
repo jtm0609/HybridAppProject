@@ -13,7 +13,7 @@
 * Firebase DynamicLink를 통한 앱 이동 
 * Glide를 통한 동적 스플래쉬 
 * HTTP캐시를 통한하이브리드 앱 성능개선
-* okHttp를 통한 버전체크 및 앱 업데이트 알림 
+* Retrofit를 통한 버전체크 및 앱 업데이트 알림 
 * Coroutine을 통한 비동기 제어
 <br><br>
 
@@ -23,8 +23,8 @@
 * Android (Kotlin)
 * Firebase Cloud Messaging(FCM)
 * Firebase Dynamic Link
-* Glide(동적 스플래쉬)
-* OKHttp
+* Glide
+* Retrofit
 * Coroutine 
 * View Binding
 <br><br>
