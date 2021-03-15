@@ -33,7 +33,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import ren.yale.android.cachewebviewlib.WebViewCacheInterceptor
 import ren.yale.android.cachewebviewlib.WebViewCacheInterceptorInst
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -66,10 +65,22 @@ class MainActivity : AppCompatActivity() {
         //1. 웹뷰가 웹resouce를 interrupt할때, 네트워크 라이브러리(okHttp)를 통해 그 resource를 로드한다.
         //2. 그 Resource를 새로지정한 캐시폴더에 저장하는 방법을 사용한다.
         var builder=WebViewCacheInterceptor.Builder(this)
+        builder.setCacheSize(1024*1024*999)
         WebViewCacheInterceptorInst.getInstance().init(builder)
 
 
         webview.loadUrl(URL)
+
+        //푸쉬메시지가 왔다면
+        if(intent!=null){
+            //setIntent(intent)
+            Log.d("tak","onNewIntent")
+            var pushedURL=getIntentUrlData(intent)
+            if(pushedURL!=null){
+                URL=pushedURL
+                webview.loadUrl(URL)
+            }
+        }
 
 
 
@@ -121,11 +132,14 @@ class MainActivity : AppCompatActivity() {
         //  progressBar.dismiss()
 
         //FCM 푸시의 Pending Intent가 URL을 넘겨주면 그 URL을 로드한다.
+        /*
         var pushedURL=getIntentUrlData(intent)
         if(pushedURL!=null){
             URL=pushedURL
             webview.loadUrl(URL)
         }
+
+         */
 
 
         //파어베이스 다이나믹 링크 처리
@@ -237,7 +251,13 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if(intent!=null){
-            setIntent(intent)
+            //setIntent(intent)
+            Log.d("tak","onNewIntent")
+            var pushedURL=getIntentUrlData(intent)
+            if(pushedURL!=null){
+                URL=pushedURL
+                webview.loadUrl(URL)
+            }
         }
     }
 
@@ -351,23 +371,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
-
-    /** 캐시 폴더, 파일 로그출력 **/
-    fun logCacheData(){
-        if(cacheDir.exists()){
-
-            //캐시디렉토리, 파일명 로그찍기
-            var cacheFiles=getCacheDir().listFiles()
-            for(file in cacheFiles)
-                Log.d("tak", "캐시 저장소 파일명: "+file.toString())
-            var martrooCacheFile= File(getCacheDir(),"CacheWebViewCache").listFiles()
-            for(file in martrooCacheFile)
-                Log.d("tak", " 마트루 캐시 저장소 파일명: "+file.toString())
-
-        }
-    }
 
 
 

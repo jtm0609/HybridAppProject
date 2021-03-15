@@ -64,9 +64,11 @@ class MyWebViewClient(val mContext:Context,val progressBar:Dialog) : WebViewClie
 
         //모바일웹으로 멤버, 토큰, 버전정보를 보낸다.
         if(url.equals("http://m.martroo.com/")) {
-            view?.loadUrl("javascript:registerMemberTokenInPage('" + token + "')") //토큰 등록
-            view?.loadUrl("javascript:setMemberVersionAndroid('" + versionCode  + "')") //버전 등록
+            //view?.loadUrl("javascript:setMemberVersionAndroid('" + versionCode  + "')") //버전 등록
+            view?.loadUrl("javascript:registerMemberToken('" + token + "')") //토큰 등록
+            Log.d("tak", token.toString())
         }
+
 
 
         //모바일웹으로 다이나믹 링크로 받은 추천인 코드를 보낸다.

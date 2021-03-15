@@ -38,6 +38,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         System.out.println("test")
         Log.d("tak","onReceive")
+            //Log.d("tak", remoteMessage.notification?.title!!)
+
             val title = remoteMessage.data.get(TITLE_TAG)
             val body= remoteMessage.data.get(BODY_TAG)
             val imageUrl= remoteMessage.data.get(IMAGE_TAG).toString()
@@ -79,8 +81,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             var builder: NotificationCompat.Builder? = null
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-
                 var channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, IMPORTANCE)
                 notificationManager.createNotificationChannel(channel)
                 builder = NotificationCompat.Builder(this@MyFirebaseMessagingService, CHANNEL_ID)
