@@ -128,18 +128,6 @@ class MainActivity : AppCompatActivity() {
      **/
     override fun onResume() {
         super.onResume()
-        //if(progressBar.isShowing)
-        //  progressBar.dismiss()
-
-        //FCM 푸시의 Pending Intent가 URL을 넘겨주면 그 URL을 로드한다.
-        /*
-        var pushedURL=getIntentUrlData(intent)
-        if(pushedURL!=null){
-            URL=pushedURL
-            webview.loadUrl(URL)
-        }
-
-         */
 
 
         //파어베이스 다이나믹 링크 처리
