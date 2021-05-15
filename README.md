@@ -10,9 +10,10 @@
 
 ## 기능
 * FCM을통한 푸쉬서비스 
-* Firebase DynamicLink를 통한 앱 이동 
-* HTTP캐시를 통한하이브리드 앱 성능개선
-* Retrofit를 통한 버전체크 및 앱 업데이트 알림 
+* Firebase DynamicLink를 통한 앱 이동
+* Http Cache 적용을 통한 앱 캐시사이즈 업그레이드
+* InApp 업데이트
+* Retrofit를 통한 버전체크을 통한 PlayStore 업데이트
 
 <br><br>
 
