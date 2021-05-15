@@ -11,10 +11,9 @@
 ## 기능
 * FCM을통한 푸쉬서비스 
 * Firebase DynamicLink를 통한 앱 이동 
-* Glide를 통한 동적 스플래쉬 
 * HTTP캐시를 통한하이브리드 앱 성능개선
 * Retrofit를 통한 버전체크 및 앱 업데이트 알림 
-* Coroutine을 통한 비동기 제어
+
 <br><br>
 
 
