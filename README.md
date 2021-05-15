@@ -23,7 +23,6 @@
 * Android (Kotlin)
 * Firebase Cloud Messaging(FCM)
 * Firebase Dynamic Link
-* Glide
 * Retrofit
 * Coroutine 
 * View Binding
