@@ -8,6 +8,11 @@
 ## 프로젝트 기간
 2021.01.25 ~ 2021 03.23<br><br>
 
+## 프로젝트 플로우차트
+![프로젝트 플로우차트](https://user-images.githubusercontent.com/48284360/122558592-398b9000-d079-11eb-8de7-8c699d4150fe.png)
+<br><br>
+
+
 ## 기능
 * FCM을통한 푸쉬서비스 
 * Firebase DynamicLink를 통한 앱 이동
